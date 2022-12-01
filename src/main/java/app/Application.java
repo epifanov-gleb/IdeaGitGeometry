@@ -7,6 +7,8 @@ import io.github.humbleui.skija.Surface;
 import java.io.File;
 import java.util.function.Consumer;
 
+import static app.Colors.APP_BACKGROUND_COLOR;
+
 /**
  * Класс окна приложения
  */
@@ -77,7 +79,7 @@ public class Application implements Consumer<Event> {
             // получаем поверхность рисования
             Surface s = ee.getSurface();
             // очищаем её канвас заданным цветом
-            s.getCanvas().clear(0xFF264653);
+            s.getCanvas().clear(APP_BACKGROUND_COLOR);
         }
     }
 }
