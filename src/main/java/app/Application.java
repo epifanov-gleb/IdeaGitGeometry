@@ -73,7 +73,7 @@ public class Application implements Consumer<Event> {
                 System.out.println("Ошибка создания слоя " + className);
             }
         }
-        label = new Label(window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, "Привет, мир!");
+        label = new Label(window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, "Привет, мир!", true, true);
 
         // если окну не присвоен ни один из слоёв
         if (window._layer == null)
