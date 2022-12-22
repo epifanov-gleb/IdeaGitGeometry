@@ -1,5 +1,6 @@
 package app;
 
+import controls.Label;
 import io.github.humbleui.jwm.*;
 import io.github.humbleui.jwm.skija.EventFrameSkija;
 import io.github.humbleui.skija.Canvas;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import static app.Colors.APP_BACKGROUND_COLOR;
+import static app.Colors.PANEL_BACKGROUND_COLOR;
 
 /**
  * Класс окна приложения
@@ -23,7 +25,18 @@ public class Application implements Consumer<Event> {
      */
     private final Window window;
 
+    /**
+     * радиус скругления элементов
+     */
     public static final float C_RAD_IN_PX = 0.5f;
+    /**
+     * отступы панелей
+     */
+    public static final int PANEL_PADDING = 5;
+    /**
+     * Первый заголовок
+     */
+    private final Label label;
 
     /**
      * Конструктор окна приложения
@@ -60,6 +73,7 @@ public class Application implements Consumer<Event> {
                 System.out.println("Ошибка создания слоя " + className);
             }
         }
+        label = new Label(window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, "Привет, мир!");
 
         // если окну не присвоен ни один из слоёв
         if (window._layer == null)
@@ -85,7 +99,7 @@ public class Application implements Consumer<Event> {
         } else if (e instanceof EventFrameSkija ee) {
             Surface s = ee.getSurface();
 
-            paint(s.getCanvas(), new CoordinateSystem2i(s.getWidth()/3, s.getHeight()/3,s.getWidth()/3,s.getHeight()/3));
+            paint(s.getCanvas(), new CoordinateSystem2i(s.getWidth(), s.getHeight()));
         }
     }
     /**
@@ -99,14 +113,9 @@ public class Application implements Consumer<Event> {
         canvas.save();
         // очищаем канвас
         canvas.clear(APP_BACKGROUND_COLOR);
-        // создаём кисть
-        Paint paint = new Paint();
-        // задаём цвет рисования
-        paint.setColor(Misc.getColor(100, 255, 255, 255));
-        // рисуем квадрат
-        canvas.drawRRect(windowCS.getRRect(4), paint);
+        // рисуем заголовок в точке [100,100] с шириной и выостой 200
+        label.paint(canvas, new CoordinateSystem2i(100, 100, 200, 200));
         // восстанавливаем состояние канваса
         canvas.restore();
     }
-
 }
