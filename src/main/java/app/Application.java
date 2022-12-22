@@ -23,6 +23,8 @@ public class Application implements Consumer<Event> {
      */
     private final Window window;
 
+    public static final float C_RAD_IN_PX = 0.5f;
+
     /**
      * Конструктор окна приложения
      */
@@ -82,6 +84,7 @@ public class Application implements Consumer<Event> {
             window.close();
         } else if (e instanceof EventFrameSkija ee) {
             Surface s = ee.getSurface();
+
             paint(s.getCanvas(), new CoordinateSystem2i(s.getWidth()/3, s.getHeight()/3,s.getWidth()/3,s.getHeight()/3));
         }
     }
