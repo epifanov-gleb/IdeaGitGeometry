@@ -71,14 +71,6 @@ public class Application implements Consumer<Event> {
     public Application() {
         // создаём окно
         window = App.makeWindow();
-        //зададим заголовок окну
-        window.setTitle("Java 2D");
-        // задаём обработчиком событий текущий объект
-        window.setEventListener(this);
-        // задаём размер окна
-        window.setWindowSize(900, 900);
-        // задаём его положение
-        window.setWindowPosition(100, 100);
         // создаём панель рисования
         panelRendering = new PanelRendering(
                 window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, 5, 3, 0, 0,
@@ -99,6 +91,15 @@ public class Application implements Consumer<Event> {
                 window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING, 5, 3, 3, 2,
                 2, 1
         );
+        //зададим заголовок окну
+        window.setTitle("Java 2D");
+        // задаём обработчиком событий текущий объект
+        window.setEventListener(this);
+        // задаём размер окна
+        window.setWindowSize(900, 900);
+        // задаём его положение
+        window.setWindowPosition(100, 100);
+
         // задаём иконку
         switch (Platform.CURRENT) {
             case WINDOWS -> window.setIcon(new File("src/main/resources/windows.ico"));
@@ -158,6 +159,9 @@ public class Application implements Consumer<Event> {
 
             paint(s.getCanvas(), new CoordinateSystem2i(s.getWidth(), s.getHeight()));
         }
+        panelControl.accept(e);
+        panelRendering.accept(e);
+        panelLog.accept(e);
     }
     /**
      * Рисование
