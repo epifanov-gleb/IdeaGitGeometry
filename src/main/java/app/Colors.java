@@ -40,4 +40,12 @@ public class Colors {
      * Цвет текста
      */
     public static final int FIELD_TEXT_COLOR = Misc.getColor(255, 0, 0, 0);
+    /**
+     * Цвет пересечения
+     */
+    public static final int CROSSED_COLOR = Misc.getColor(200, 0, 255, 255);
+    /**
+     * Цвет разности
+     */
+    public static final int SUBTRACTED_COLOR = Misc.getColor(200, 255, 255, 0);
 }
