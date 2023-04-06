@@ -117,7 +117,7 @@ public abstract class Panel implements Consumer<Event> {
     }
 
     /**
-     * Метод рисованияв конкретной реализации
+     * Метод рисования в конкретной реализации
      *
      * @param canvas   область рисования
      * @param windowCS СК окна

@@ -111,7 +111,7 @@ public class CoordinateSystem2i {
     }
 
     /**
-     * Получить максимальную координата
+     * Получить максимальную координату
      *
      * @return максимальная координата
      */
@@ -120,7 +120,7 @@ public class CoordinateSystem2i {
     }
 
     /**
-     * Получить минимальную координата
+     * Получить минимальную координату
      *
      * @return минимальная координата
      */
@@ -174,6 +174,9 @@ public class CoordinateSystem2i {
                 (int) ((y - coordinateSystem.getMin().y) * (size.y - 1) / coordinateSystem.getSize().y + min.y)
         );
     }
+
+
+
 
     /**
      * Получить координаты вектора в текущей системе координат
