@@ -1,15 +1,11 @@
 package app;
 
 import controls.InputFactory;
-import controls.Label;
 import io.github.humbleui.jwm.*;
 import io.github.humbleui.jwm.skija.EventFrameSkija;
 import io.github.humbleui.skija.Canvas;
-import io.github.humbleui.skija.Paint;
-import io.github.humbleui.skija.RRect;
 import io.github.humbleui.skija.Surface;
 import misc.CoordinateSystem2i;
-import misc.Misc;
 import panels.PanelControl;
 import panels.PanelHelp;
 import panels.PanelLog;
@@ -31,6 +27,10 @@ public class Application implements Consumer<Event> {
     private final Window window;
 
     /**
+     * ширина окна (
+     */
+    public int win_weight = 900;
+    /**
      * радиус скругления элементов
      */
     public static final float C_RAD_IN_PX = 0.5f;
@@ -38,18 +38,6 @@ public class Application implements Consumer<Event> {
      * отступы панелей
      */
     public static final int PANEL_PADDING = 5;
-    /**
-     * Первый заголовок
-     */
-    private final Label label;
-    /**
-     * Первый заголовок
-     */
-    private final Label label2;
-    /**
-     * Первый заголовок
-     */
-    private final Label label3;
     /**
      * панель легенды
      */
@@ -101,7 +89,7 @@ public class Application implements Consumer<Event> {
                 2, 1
         );
         //зададим заголовок окну
-        window.setTitle("Java 2D");
+        window.setTitle("Задача 5");
         // задаём обработчиком событий текущий объект
         window.setEventListener(this);
         // задаём размер окна
@@ -130,16 +118,6 @@ public class Application implements Consumer<Event> {
                 System.out.println("Ошибка создания слоя " + className);
             }
         }
-        // создаём первый заголовок
-        label = new Label(window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING,
-                4, 4, 1, 1, 1, 1, "Привет, мир!", true, true);
-        // создаём второй заголовок
-        label2 = new Label(window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING,
-                4, 4, 0, 3, 1, 1, "Второй заголовок", true, true);
-
-        // создаём третий заголовок
-        label3 = new Label(window, true, PANEL_BACKGROUND_COLOR, PANEL_PADDING,
-                4, 4, 2, 0, 1, 1, "Это тоже заголовок", true, true);
 
 
         // если окну не присвоен ни один из слоёв
@@ -214,7 +192,7 @@ public class Application implements Consumer<Event> {
      * @param windowCS СК окна
      */
     public void paint(Canvas canvas, CoordinateSystem2i windowCS) {
-        // запоминаем изменения (пока что там просто заливка цветом)
+        // запоминаем изменения
         canvas.save();
         // очищаем канвас
         canvas.clear(APP_BACKGROUND_COLOR);

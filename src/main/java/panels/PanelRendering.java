@@ -1,9 +1,8 @@
 package panels;
 
-import app.Point;
+
 import app.Task;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.humbleui.jwm.Event;
 import io.github.humbleui.jwm.EventMouseButton;
@@ -13,10 +12,11 @@ import misc.CoordinateSystem2d;
 import misc.CoordinateSystem2i;
 import misc.Vector2d;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+
 
 
 /**
@@ -94,12 +94,17 @@ public class PanelRendering extends GridPanel {
         CoordinateSystem2d cs = new CoordinateSystem2d(
                 new Vector2d(-10.0, -10.0), new Vector2d(10.0, 10.0)
         );
-
-        // создаём задачу без точек
+        // создаём задачу без окружностей
         task = new Task(cs, new ArrayList<>());
-        // добавляем в нё 10 случайных
-        task.addRandomPoints(10);
+        // добавляем в неё 10 случайных окружностей
+         task.addRandomCircles(10);
+        // добавляем в неё окружности для проверки
+        //task.addCircle(new Vector2d(0,0),5);
+       // task.addCircle(new Vector2d(5,5),3);
+        //task.addCircle(new Vector2d(-4,-1),4);
+      // task.addCircle(new Vector2d(1,-1),8);
     }
+
 
     /**
      * Обработчик событий
@@ -115,9 +120,11 @@ public class PanelRendering extends GridPanel {
             // если последнее положение мыши сохранено и курсор был внутри
             if (lastMove != null && lastInside) {
                 // если событие - нажатие мыши
-                if (ee.isPressed())
+                if (ee.isPressed()) {
+                    PanelControl.solve.text = "Решить";
                     // обрабатываем клик по задаче
                     task.click(lastWindowCS.getRelativePos(lastMove), ee.getButton());
+                }
             }
         }
     }

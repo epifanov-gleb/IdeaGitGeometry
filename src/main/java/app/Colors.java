@@ -41,11 +41,19 @@ public class Colors {
      */
     public static final int FIELD_TEXT_COLOR = Misc.getColor(255, 0, 0, 0);
     /**
-     * Цвет пересечения
+     * Цвет обычных окружностей
      */
-    public static final int CROSSED_COLOR = Misc.getColor(200, 0, 255, 255);
+    public static final int CIRCLE_COLOR = Misc.getColor(200, 0, 255, 255);
     /**
-     * Цвет разности
+     * Цвет решения
      */
-    public static final int SUBTRACTED_COLOR = Misc.getColor(200, 255, 255, 0);
+    public static final int SOLVER_COLOR = Misc.getColor(200, 0, 255, 0);
+    /**
+     * Цвет текста
+     */
+    public static final int HELP_TEXT = Misc.getColor(255, 255, 255, 255);
+    /**
+     * Цвет фона
+     */
+    public static final int HELP_TEXT_BACKGROUND = Misc.getColor(50, 0, 0, 0);
 }
