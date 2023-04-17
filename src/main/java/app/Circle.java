@@ -61,6 +61,7 @@ public class Circle {
                 ", radius=" + String.format("%.2f", radius).replace(",", ".") +
                 '}';
     }
+
     /**
      * Обнулить окружность
      *
