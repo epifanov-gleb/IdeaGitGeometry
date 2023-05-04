@@ -7,7 +7,7 @@ import misc.Vector2d;
 import java.util.Objects;
 
 /**
- * Класс точки
+ * Класс окружности
  */
 public class Circle {
     /**

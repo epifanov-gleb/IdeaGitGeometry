@@ -163,6 +163,17 @@ public class CoordinateSystem2i {
     /**
      * Получить координаты вектора в текущей системе координат
      *
+     * @param coords           координаты вектора в другой системе координат
+     * @param coordinateSystem система координат, в которой заданы координаты вектора
+     * @return координаты вектора в текущей системе координат
+     */
+    public Vector2i getCoords(Vector2i coords, CoordinateSystem2i coordinateSystem) {
+        return this.getCoords(coords.x, coords.y, coordinateSystem);
+    }
+
+    /**
+     * Получить координаты вектора в текущей системе координат
+     *
      * @param x                координата X вектора в другой системе координат
      * @param y                координата Y вектора в другой системе координат
      * @param coordinateSystem система координат, в которой заданы координаты вектора
@@ -178,16 +189,6 @@ public class CoordinateSystem2i {
 
 
 
-    /**
-     * Получить координаты вектора в текущей системе координат
-     *
-     * @param coords           координаты вектора в другой системе координат
-     * @param coordinateSystem система координат, в которой заданы координаты вектора
-     * @return координаты вектора в текущей системе координат
-     */
-    public Vector2i getCoords(Vector2i coords, CoordinateSystem2i coordinateSystem) {
-        return this.getCoords(coords.x, coords.y, coordinateSystem);
-    }
 
     /**
      * Получить координаты вектора в текущей системе координат
@@ -245,10 +246,10 @@ public class CoordinateSystem2i {
     }
     /**
      * Получить вектор подобия двух систем координат
-     * (значения единичного размера, указанного в переданнной в аргументах СК в текущей СК)
+     * (значения единичного размера, указанного в переданной в аргументах СК в текущей СК)
      *
      * @param coordinateSystem система координат, подобие с которой нужно получить
-     * @return вектор подобий вдоль соответствующиъ осей координат
+     * @return вектор подобий вдоль соответствующих осей координат
      */
     public Vector2i getSimilarity(CoordinateSystem2d coordinateSystem) {
         return new Vector2i(
@@ -259,10 +260,10 @@ public class CoordinateSystem2i {
 
     /**
      * Получить вектор подобия двух систем координат
-     * (значения единичного размера, указанного в переданнной в аргументах СК в текущей СК)
+     * (значения единичного размера, указанного в переданной в аргументах СК в текущей СК)
      *
      * @param coordinateSystem система координат, подобие с которой нужно получить
-     * @return вектор подобий вдоль соответствующиъ осей координат
+     * @return вектор подобий вдоль соответствующих осей координат
      */
     public Vector2i getSimilarity(CoordinateSystem2i coordinateSystem) {
         return new Vector2i(

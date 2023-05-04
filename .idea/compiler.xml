@@ -11,6 +11,7 @@
         <module name="IdeaGitGeometry" />
         <module name="test" />
         <module name="JAVA_10" />
+        <module name="IdeaGitGeometry-master3" />
       </profile>
     </annotationProcessing>
   </component>

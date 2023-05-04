@@ -11,6 +11,7 @@ import misc.CoordinateSystem2d;
 import misc.CoordinateSystem2i;
 import misc.Vector2d;
 import misc.Vector2i;
+import panels.PanelControl;
 import panels.PanelLog;
 
 import java.util.ArrayList;
@@ -72,6 +73,18 @@ public class Task {
     @Getter
     @JsonIgnore
     private Chord max_chord;
+
+    /**
+     * Запоминаем значение центра рисуемой окружности
+     */
+    @Getter
+    @JsonIgnore
+    private Vector2d new_center;
+
+    /**
+     * был ли задан центр рисуемой окружности
+     */
+    protected boolean last_new_center = false;
 
     /**
      * Задача
@@ -282,8 +295,8 @@ public class Task {
             canvas.drawRect(Rect.makeXYWH(pos.x - 1, 0, 2, windowCS.getSize().y), paint);
             // смещаемся немного для красивого вывода текста
             canvas.translate(pos.x + 3, pos.y - 5);
-            // положение курсора в пространстве задачи
-            Vector2d realPos = getRealPos(pos.x, pos.y, lastWindowCS);
+            // положение курсора в пространстве задачи (переворачиваем y)
+            Vector2d realPos = getRealPos(pos.x, lastWindowCS.getMax().y - pos.y, lastWindowCS);
             // выводим координаты
             canvas.drawString(realPos.toString(), 0, 0, font, paint);
             // восстанавливаем область рисования
@@ -300,7 +313,7 @@ public class Task {
     public void renderGrid(Canvas canvas, CoordinateSystem2i windowCS) {
         // сохраняем область рисования
         canvas.save();
-        // получаем ширину штриха(т.е. по факту толщину линии)
+        // получаем ширину штриха (т.е. по факту толщину линии)
         float strokeWidth = 0.03f / (float) ownCS.getSimilarity(windowCS).y + 0.5f;
         // создаём перо соответствующей толщины
         try (var paint = new Paint().setMode(PaintMode.STROKE).setStrokeWidth(strokeWidth).setColor(TASK_GRID_COLOR)) {
@@ -308,48 +321,24 @@ public class Task {
             for (int i = (int) (ownCS.getMin().x); i <= (int) (ownCS.getMax().x); i++) {
                 // находим положение этих штрихов на экране
                 Vector2i windowPos = windowCS.getCoords(i, 0, ownCS);
-                // каждый 10 штрих увеличенного размера
+                // каждый DELIMITER_ORDER штрих увеличенного размера
                 float strokeHeight = i % DELIMITER_ORDER == 0 ? 5 : 2;
-                // рисуем вертикальный штрих
-                canvas.drawLine(windowPos.x, windowPos.y, windowPos.x, windowPos.y + strokeHeight, paint);
-                canvas.drawLine(windowPos.x, windowPos.y, windowPos.x, windowPos.y - strokeHeight, paint);
+                // рисуем вертикальный штрих (переворачиваем y)
+                canvas.drawLine(windowPos.x, windowCS.getMax().y - windowPos.y, windowPos.x, windowCS.getMax().y - windowPos.y + strokeHeight, paint);
+                canvas.drawLine(windowPos.x, windowCS.getMax().y - windowPos.y, windowPos.x, windowCS.getMax().y - windowPos.y - strokeHeight, paint);
             }
             // перебираем все целочисленные отсчёты нашей СК по оси Y
             for (int i = (int) (ownCS.getMin().y); i <= (int) (ownCS.getMax().y); i++) {
                 // находим положение этих штрихов на экране
                 Vector2i windowPos = windowCS.getCoords(0, i, ownCS);
-                // каждый 10 штрих увеличенного размера
-                float strokeHeight = i % 10 == 0 ? 5 : 2;
+                // каждый DELIMITER_ORDER штрих увеличенного размера
+                float strokeHeight = i % DELIMITER_ORDER == 0 ? 5 : 2;
                 // рисуем горизонтальный штрих
-                canvas.drawLine(windowPos.x, windowPos.y, windowPos.x + strokeHeight, windowPos.y, paint);
-                canvas.drawLine(windowPos.x, windowPos.y, windowPos.x - strokeHeight, windowPos.y, paint);
+                canvas.drawLine(windowPos.x, windowCS.getMax().y - windowPos.y, windowPos.x + strokeHeight, windowCS.getMax().y - windowPos.y, paint);
+                canvas.drawLine(windowPos.x, windowCS.getMax().y - windowPos.y, windowPos.x - strokeHeight, windowCS.getMax().y - windowPos.y, paint);
             }
         }
         // восстанавливаем область рисования
-        canvas.restore();
-    }
-
-    /**
-     * Рисование задачи
-     *
-     * @param canvas   область рисования
-     * @param windowCS СК окна
-     */
-    private void renderTask(Canvas canvas, CoordinateSystem2i windowCS) {
-        canvas.save();
-        // создаём перо
-        try (var paint = new Paint()) {
-            for (Circle p : circles) {
-
-                paint.setColor(CIRCLE_COLOR);
-
-                // y-координату разворачиваем, потому что у СК окна ось y направлена вниз,
-                // а в классическом представлении - вверх
-                Vector2i windowPos = windowCS.getCoords(p.centre.x, p.centre.y, ownCS);
-                // рисуем точку
-                canvas.drawRect(Rect.makeXYWH(windowPos.x - POINT_SIZE, windowPos.y - POINT_SIZE, POINT_SIZE * 2, POINT_SIZE * 2), paint);
-            }
-        }
         canvas.restore();
     }
 
@@ -366,16 +355,18 @@ public class Task {
         Vector2i pos1 = new Vector2i(pos.x, lastWindowCS.getMax().y - pos.y);
         // получаем положение на экране
         Vector2d taskPos = ownCS.getCoords(pos1, lastWindowCS);
-        //!!!!!!!! Сделать по нажатию кнопки задание центра и
-        // по отпусканию кнопки задание радиуса (точки на окружности)
-
-        // если левая кнопка мыши, добавляем окружность случайного радиуса
-        double tmpR = ThreadLocalRandom.current().nextDouble(0, Math.min(ownCS.getSize().x, ownCS.getSize().y) / 2);
+        // если левая кнопка, запоминаем центр (он будет прорисован) и ждём правую,
+        // если снова левая, то обновляем значение центра (старый центр не будет прорисован, т.к. его нет в глобальной переменной),
+        // если правая при известном центре - рисуем окружность,
+        // если центр задан не был, то ничего не происходит
         if (mouseButton.equals(MouseButton.PRIMARY)) {
-            addCircle(taskPos, tmpR);
-            // если правая, то же самое
-        } else if (mouseButton.equals(MouseButton.SECONDARY)) {
-            addCircle(taskPos, tmpR);
+            new_center = taskPos;
+            last_new_center = true;
+        } else if (mouseButton.equals(MouseButton.SECONDARY) && last_new_center) {
+                last_new_center = false;
+                Vector2d tmpR = Vector2d.subtract(taskPos,new_center);
+                addCircle(new_center, tmpR.length());
+                PanelControl.solve.text = "Решить";
         }
     }
 
@@ -450,36 +441,54 @@ public class Task {
 
     }
 
-
     /**
-     * Рисование задачи
+     * Рисуем центр
      *
      * @param canvas   область рисования
      * @param windowCS СК окна
      */
-    public void paint(Canvas canvas, CoordinateSystem2i windowCS) {
-        // Сохраняем последнюю СК
-        lastWindowCS = windowCS;
-        // Сохраняем последнюю СК
-        lastWindowCS = windowCS;
-        // рисуем координатную сетку
-        renderGrid(canvas, lastWindowCS);
-        // рисуем задачу
-        renderTask(canvas, windowCS);
+    private void paint_point(Canvas canvas, CoordinateSystem2i windowCS, Vector2d c) {
         canvas.save();
         // создаём перо
         try (var paint = new Paint()) {
             paint.setColor(CIRCLE_COLOR);
+            // y-координату разворачиваем, потому что у СК окна ось y направлена вниз,
+            // а в классическом представлении - вверх
+            Vector2i windowPos = windowCS.getCoords(c.x, c.y, ownCS);
+            // рисуем точку
+            canvas.drawRect(Rect.makeXYWH(windowPos.x - POINT_SIZE, lastWindowCS.getMax().y - (windowPos.y - POINT_SIZE), POINT_SIZE * 2, POINT_SIZE * 2), paint);
+            canvas.restore();
+        }
+    }
+
+
+
+
+        /**
+         * Рисование задачи
+         *
+         * @param canvas   область рисования
+         * @param windowCS СК окна
+         */
+    private void renderTask(Canvas canvas, CoordinateSystem2i windowCS) {
+        canvas.save();
+        // создаём перо
+        try (var paint = new Paint()) {
+            paint.setColor(CIRCLE_COLOR);
+            // рисуем центр новой окружности, для которой ожидается радиус
+            if (last_new_center){
+                paint_point(canvas,windowCS,new_center);
+            }
             for (Circle c : circles) {
+                // рисуем центр
+                paint_point(canvas,windowCS,c.centre);
                 // y-координату разворачиваем, потому что у СК окна ось y направлена вниз,
                 // а в классическом представлении - вверх
                 Vector2i windowPos = windowCS.getCoords(c.centre.x, c.centre.y, ownCS);
-                // рисуем точку
-                canvas.drawRect(Rect.makeXYWH(windowPos.x - POINT_SIZE, lastWindowCS.getMax().y - (windowPos.y - POINT_SIZE), POINT_SIZE * 2, POINT_SIZE * 2), paint);
                 // рисуем окружность
                 float[] points = arrCircle(c.centre, c.radius);
                 canvas.drawLines(points, paint);
-            }
+                }
             // решение обрисовываем другим цветом
             if (solved && cross) {
                 paint.setColor(SOLVER_COLOR);
@@ -496,6 +505,22 @@ public class Task {
     }
 
     /**
+     * Рисование всего комплекса
+     *
+     * @param canvas   область рисования
+     * @param windowCS СК окна
+     */
+    public void paint(Canvas canvas, CoordinateSystem2i windowCS) {
+        // Сохраняем последнюю СК
+        lastWindowCS = windowCS;
+        // рисуем координатную сетку
+        renderGrid(canvas, lastWindowCS);
+        // рисуем задачу
+        renderTask(canvas, windowCS);
+
+    }
+
+    /**
      * Масштабирование области просмотра задачи
      *
      * @param delta  прокрутка колеса
@@ -503,6 +528,9 @@ public class Task {
      */
     public void scale(float delta, Vector2i center) {
         if (lastWindowCS == null) return;
+        // переворачиваем y
+        int tmp = lastWindowCS.getMax().y - center.y;
+        center.y = tmp;
         // получаем координаты центра масштабирования в СК задачи
         Vector2d realCenter = ownCS.getCoords(center, lastWindowCS);
         // выполняем масштабирование
